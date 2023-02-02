@@ -2,6 +2,7 @@ import os
 import shutil
 import time
 import logging
+import argparse
 
 from sevdesk import sevdesk
 from easybill import easybill
@@ -55,6 +56,23 @@ if __name__ == "__main__":
     # setup logging
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(asctime)s %(message)s")
 
+    #setup command line arguments to select invoices
+    parser = argparse.ArgumentParser('--invoice_list <inv-1,inv-2>'+'--dates <2023-01-01,2023-01-31> ')
+    parser.add_argument('-l', '--invoice_list', help='Provide a list of invoices (comma seperated)')
+    parser.add_argument('-d', '--document_date', help='Provide a document_date horizon (comma seperated)')
+    args = parser.parse_args()
+    invoice_list = args.invoice_list
+    document_date = args.document_date
+
+    #define invoice filter
+    filter={"type":"INVOICE,CREDIT", "is_archive":"0", "is_draft":"0"}
+    if invoice_list:
+        filter["number"]=str(invoice_list)
+    elif document_date:
+        filter["document_date"]=str(document_date)
+    else:
+        raise ValueError('Provide a invoice_list or document_date. See Command Line Arguments')
+
     EASYBILL_API_KEY = os.getenv('EASYBILL_API_KEY')
     eb = easybill(EASYBILL_API_KEY)
 
@@ -62,7 +80,6 @@ if __name__ == "__main__":
     sd = sevdesk(SEVDESK_API_KEY)
 
     #Get Relevant Invoices from Sevdesk
-    filter={"number": "202310026", "type":"INVOICE,CREDIT", "is_archive":"0", "is_draft":"0"}
     #filter={"document_date": "2023-02-01,2030-12-31", "type":"INVOICE,CREDIT", "is_archive":"0", "is_draft":"0"}
     documents = eb.get_documents(filter)
 
