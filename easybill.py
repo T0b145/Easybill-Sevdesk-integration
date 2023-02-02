@@ -3,6 +3,7 @@
 from datetime import datetime
 import requests
 import json
+import logging
 
 class easybill:
     def __init__(self, API_KEY):
@@ -17,9 +18,9 @@ class easybill:
         if r.status_code == 200:
             return r.json()
         else:
-            print ("Documents konnten nicht abgerufen werden")
-            print("Status Code: ", r.status_code)
-            print("Error message: ", r.json())
+            logging.error("Documents konnten nicht abgerufen werden")
+            logging.error("Status Code: ", r.status_code)
+            logging.error("Error message: ", r.json())
     
     def get_document_pdf(self,document_no):
         url = self.API_URL + "documents/{}/pdf".format(document_no)
@@ -27,12 +28,15 @@ class easybill:
         if file.status_code == 200:
             return file.content
         else:
-            print ("File konnte nicht runtergeladen werden")
-            print("Status Code: ", file.status_code)
-            print("Error message: ", file.json())
+            logging.error("File konnte nicht runtergeladen werden")
+            logging.error("Status Code: ", file.status_code)
+            logging.error("Error message: ", file.json())
 
 
 if __name__ == "__main__":
+    # setup logging
+    logging.basicConfig(level=logging.DEBUG)
+
     #Load Environment variables
     import os
     from dotenv import load_dotenv
