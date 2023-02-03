@@ -6,10 +6,6 @@ import argparse
 from sevdesk import sevdesk
 from easybill import easybill
 
-#Load .env file
-from dotenv import load_dotenv
-load_dotenv()
-
 def create_voucher(document, filename):
     if document["type"] == "INVOICE":
         creditDebit = "D"
