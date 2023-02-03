@@ -76,7 +76,7 @@ if __name__ == "__main__":
     test_flag = args.test
 
     #define invoice filter
-    filter={"type":"INVOICE,CREDIT", "is_archive":"0", "is_draft":"0"}
+    filter={"type":"INVOICE,CREDIT", "is_archive":"0", "is_draft":"0", "limit":1000}
     if invoice_list:
         filter["number"]=str(invoice_list)
     elif document_date:
@@ -97,21 +97,22 @@ if __name__ == "__main__":
 
     # Iterate over documents
     for document in documents["items"]:
-        logging.info("Document: {}".format(document["number"]))        
+        logging.debug("Document: {}".format(document["number"]))        
         #Validate if no replica
         if document["is_replica"] is True:
-            logging.info("Document is replica")
+            logging.debug("Document is replica")
             continue
 
         #Validate if invoice is already available in Sevdesk
         voucher_check = sd.get_vouchers(filter={"descriptionLike": document["number"]})["objects"]
         if voucher_check != []:
-            logging.info("Document already available in SevDesk")
+            logging.debug("Document already available in SevDesk")
             continue
 
         #Stop if run is only for testing
         if test_flag:
             uploaded_list.append(document["number"])
+            logging.info("Voucher would have been booked: {}".format(document["number"]))
             continue
 
         #Get pdf file from Easybill
@@ -132,11 +133,6 @@ if __name__ == "__main__":
         date = voucher['objects']['voucher']['voucherDate']
         booked_voucher = sd.book_voucher(voucher_id=voucher["objects"]["voucher"]["id"], checkaccount_id=checkaccount_id, amount=amount, date=date)
         uploaded_list.append(document["number"])
-        logging.info("Voucher successfully booked")
+        logging.info("Voucher booked: {}".format(document["number"]))
 
-    logging.info("Done!!! Uploaded Documents: ")
-    for document in uploaded_list:
-        logging.info(document)
-
-
-    
+    logging.debug("Done!!!")
