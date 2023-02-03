@@ -14,8 +14,6 @@ jobs:
     environment: default
     steps:
     - uses: actions/checkout@v2
-      with:
-        ref: workflow
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
