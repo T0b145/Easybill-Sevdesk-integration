@@ -51,7 +51,6 @@ if __name__ == "__main__":
     #### SETUP ####
     #setup API Access
     EASYBILL_API_KEY = os.getenv('EASYBILL_API_KEY')
-    print (EASYBILL_API_KEY[1:3])
     eb = easybill(EASYBILL_API_KEY)
 
     SEVDESK_API_KEY = os.getenv('SEVDESK_API_KEY')
