@@ -18,9 +18,10 @@ on:
       test:
         description: 'Test Run Flag'
         required: false
-        default: ''
+        default: ' '
         type: choice
         options:
+        - ' '
         - '-t'
 
   schedule:
