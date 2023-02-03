@@ -53,16 +53,27 @@ def create_voucher(document, filename):
     return voucher_template
 
 if __name__ == "__main__":
-    # setup logging
+    #### SETUP ####
+    #setup API Access
+    EASYBILL_API_KEY = os.getenv('EASYBILL_API_KEY')
+    eb = easybill(EASYBILL_API_KEY)
+
+    SEVDESK_API_KEY = os.getenv('SEVDESK_API_KEY')
+    sd = sevdesk(SEVDESK_API_KEY)
+
+    #setup logging
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(asctime)s %(message)s")
 
-    #setup command line arguments to select invoices
+    #setup command line arguments to select invoices & test cycle
     parser = argparse.ArgumentParser('--invoice_list <inv-1,inv-2>'+'--dates <2023-01-01,2023-01-31> ')
     parser.add_argument('-l', '--invoice_list', help='Provide a list of invoices (comma seperated)')
     parser.add_argument('-d', '--document_date', help='Provide a document_date horizon (comma seperated)')
+    parser.add_argument('-t', '--test', action='store_true')
+    
     args = parser.parse_args()
     invoice_list = args.invoice_list
     document_date = args.document_date
+    test_flag = args.test
 
     #define invoice filter
     filter={"type":"INVOICE,CREDIT", "is_archive":"0", "is_draft":"0"}
@@ -73,15 +84,16 @@ if __name__ == "__main__":
     else:
         raise ValueError('Provide a invoice_list or document_date. See Command Line Arguments')
 
-    EASYBILL_API_KEY = os.getenv('EASYBILL_API_KEY')
-    eb = easybill(EASYBILL_API_KEY)
-
-    SEVDESK_API_KEY = os.getenv('SEVDESK_API_KEY')
-    sd = sevdesk(SEVDESK_API_KEY)
+    #### RUN ####
+    if test_flag:
+        logging.info("This is a test, no invoices are transfered")
 
     #Get Relevant Invoices from Sevdesk
     #filter={"document_date": "2023-02-01,2030-12-31", "type":"INVOICE,CREDIT", "is_archive":"0", "is_draft":"0"}
+    uploaded_list = []
     documents = eb.get_documents(filter)
+    if documents["items"] == []:
+        logging.info("No invoices in easybill found.")
 
     # Iterate over documents
     for document in documents["items"]:
@@ -97,7 +109,12 @@ if __name__ == "__main__":
             logging.info("Document already available in SevDesk")
             continue
 
-        #Get pdf file from Sevdesk
+        #Stop if run is only for testing
+        if test_flag:
+            uploaded_list.append(document["number"])
+            continue
+
+        #Get pdf file from Easybill
         pdf_file = eb.get_document_pdf(document["id"])
 
         #Upload file to sevdesk and save filename
@@ -114,8 +131,12 @@ if __name__ == "__main__":
         amount = float(voucher['objects']['voucher']['sumGross'])
         date = voucher['objects']['voucher']['voucherDate']
         booked_voucher = sd.book_voucher(voucher_id=voucher["objects"]["voucher"]["id"], checkaccount_id=checkaccount_id, amount=amount, date=date)
+        uploaded_list.append(document["number"])
         logging.info("Voucher successfully booked")
 
-    logging.debug("Done!!")
+    logging.info("Done!!! Uploaded Documents: ")
+    for document in uploaded_list:
+        logging.info(document)
+
 
     
