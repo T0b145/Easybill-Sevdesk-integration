@@ -38,4 +38,4 @@ jobs:
         SEVDESK_API_KEY: ${{ secrets.SEVDESK_API_KEY }}
         EASYBILL_API_KEY: ${{ secrets.EASYBILL_API_KEY }}
       run: |
-        python app.py -log DEBUG -d $START_DATE,2030-12-30 -t
+        python app.py -log DEBUG -d $START_DATE,2030-12-30
