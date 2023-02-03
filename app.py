@@ -57,15 +57,14 @@ if __name__ == "__main__":
     sd = sevdesk(SEVDESK_API_KEY)
 
     #setup logging
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(asctime)s %(message)s")
-
-    #setup command line arguments to select invoices & test cycle
     parser = argparse.ArgumentParser('--invoice_list <inv-1,inv-2>'+'--dates <2023-01-01,2023-01-31> ')
     parser.add_argument('-l', '--invoice_list', help='Provide a list of invoices (comma seperated)')
     parser.add_argument('-d', '--document_date', help='Provide a document_date horizon (comma seperated)')
     parser.add_argument('-t', '--test', action='store_true')
+    parser.add_argument( '-log', '--loglevel', default='info', help='Provide logging level. Example --loglevel debug, default=warning' )
     
     args = parser.parse_args()
+    logging.basicConfig(level=args.loglevel.upper(), format="%(levelname)s: %(asctime)s %(message)s")
     invoice_list = args.invoice_list
     document_date = args.document_date
     test_flag = args.test
