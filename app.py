@@ -78,6 +78,7 @@ if __name__ == "__main__":
         filter["document_date"]=str(document_date)
     else:
         raise ValueError('Provide a invoice_list or document_date. See Command Line Arguments')
+    logging.debug("Filter: {}".format(filter))
 
     #### RUN ####
     if test_flag:
