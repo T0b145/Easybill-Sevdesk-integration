@@ -9,12 +9,12 @@ on:
       logLevel:
         description: 'Log level'
         required: true
-        default: 'info'
+        default: '- log info'
         type: choice
         options:
-        - info
-        - warning
-        - debug
+        - -log info
+        - -log warning
+        - -log debug
       test:
         description: 'Test Run Flag'
         required: false
@@ -47,4 +47,4 @@ jobs:
         SEVDESK_API_KEY: ${{ secrets.SEVDESK_API_KEY }}
         EASYBILL_API_KEY: ${{ secrets.EASYBILL_API_KEY }}
       run: |
-        python app.py -log ${{ github.event.inputs.logLevel }} -d $START_DATE,2030-12-30 ${{ github.event.inputs.test }}
+        python app.py -d $START_DATE,2030-12-30 ${{ github.event.inputs.logLevel }} ${{ github.event.inputs.test }}
