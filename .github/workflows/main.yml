@@ -40,7 +40,7 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Set start date
-      run: echo "START_DATE=$(date -d '-30 day' +'%Y-%m-%d')" >> $GITHUB_ENV
+      run: echo "START_DATE=$(date -d '-60 day' +'%Y-%m-%d')" >> $GITHUB_ENV
     - name: Run app.py
       env:
         SEVDESK_API_KEY: ${{ secrets.SEVDESK_API_KEY }}
